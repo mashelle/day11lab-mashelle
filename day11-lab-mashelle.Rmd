@@ -1,0 +1,89 @@
+
+```{r}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE
+)
+```
+
+
+
+```{r}
+
+library(tidyverse)
+library(MASS)
+
+ad <- read_csv("/Users/nia/Desktop/isi-buds/day11lab-mashelle/alzheimer_data.csv")
+```
+```{r}
+(ad)
+```
+```{r}
+fit_lhippo_on_age <- lm(
+  formula = lhippo ~ age,
+  data = ad
+  )
+```
+
+```{r}
+summary(fit_lhippo_on_age)
+```
+```{r}
+ad_fit1 <- ad %>%
+  mutate(y_hat = fit_lhippo_on_age$fitted.values)
+
+ggplot(ad_fit1, aes(x = age, y = lhippo)) +
+  geom_point() +
+  geom_point(aes(x = age, y = y_hat), color = "green") +
+  xlab("Age") +
+  ylab("Left Hippocampus volume") +
+  theme_bw()
+```
+
+```{r}
+fit_lhippo_on_educ <- lm(
+  formula = lhippo ~ educ,
+  data = ad
+  )
+
+ad_fit2 <- ad %>%
+  mutate(y_hat = fit_lhippo_on_educ$fitted.values)
+
+ggplot(ad_fit2, aes(x = educ, y = lhippo)) +
+  geom_point() +
+  geom_point(aes(x = educ, y = y_hat), color = "green") +
+  xlab("Education (Years)") +
+  ylab("Left Hippocampus volume")
+  theme_bw()
+```
+```{r}
+confint((fit_lhippo_on_educ))
+```
+Interpretation of $\hat{\beta_0}$:
+
+we estimate the mean left hippocampus volume for individuals with 0 years
+of education to be 2.6.
+
+```{r}
+#GLM
+
+ad <- ad %>%
+  mutate(disease.status = ifelse(
+    diagnosis == 0,
+    yes = 0,
+    no = 1
+  ))
+
+```
+
+
+```{r}
+fit_glm <- glm(
+  disease.status ~ age + educ + naccicv + female,
+  data = ad,
+  family = "binomial"
+)
+
+
+```
+
